@@ -1,10 +1,83 @@
-# Testing Documentation
+# Testing Guide
+
+This guide explains how to run tests locally before pushing to GitHub, preventing CI failures and speeding up development.
 
 ## Automated Testing Status
 
 [![Tests](https://github.com/kwschulz/cable_modem_monitor/actions/workflows/tests.yml/badge.svg)](https://github.com/kwschulz/cable_modem_monitor/actions/workflows/tests.yml)
 
-The Cable Modem Monitor integration has comprehensive automated testing via GitHub Actions.
+---
+
+## Prerequisites
+
+Before running tests locally, ensure you have:
+
+```bash
+# Check Python version (3.11+ required)
+python3 --version
+
+# Install required system packages (Ubuntu/Debian/WSL)
+sudo apt update
+sudo apt install python3-pip python3-venv
+
+# Verify installation
+python3 -m pip --version
+python3 -m venv --help
+```
+
+**Note:** If you're using Windows with WSL, make sure these packages are installed in your WSL distribution.
+
+---
+
+## Quick Start - Local Testing
+
+### First-Time Setup
+
+Run the full test suite (creates virtual environment automatically):
+
+```bash
+./run_tests_local.sh
+```
+
+This will:
+- Create a Python virtual environment (`venv/`)
+- Install all test dependencies
+- Run code quality checks (ruff)
+- Run all tests with pytest
+- Generate coverage report
+
+**Time:** ~2-3 minutes (first run), ~30 seconds (subsequent runs)
+
+### Quick Testing During Development
+
+After initial setup, use the quick test script:
+
+```bash
+./quick_test.sh
+```
+
+This runs tests with minimal output for rapid feedback during development.
+
+**Time:** ~5-10 seconds
+
+---
+
+## Why Test Locally?
+
+**Benefits:**
+- ⚡ Catch errors before CI runs (faster feedback)
+- 💰 Save GitHub Actions minutes
+- 🎯 Prevent "fix CI" commits
+- 📈 Maintain code quality
+- 🚀 Faster development cycle
+
+**Recommended Workflow:**
+1. Make code changes
+2. Run `./quick_test.sh` frequently during development
+3. Run `./run_tests_local.sh` before committing
+4. Push to GitHub only when local tests pass
+
+---
 
 ## Test Suite Overview
 
@@ -53,53 +126,79 @@ Real HTML responses from modems in `tests/fixtures/`:
    - HACS validation
    - Ensures integration meets HACS requirements
 
-## Running Tests Locally
+## Manual Testing (Alternative)
 
-### Quick Start
+If you prefer manual control over the test environment:
+
+### 1. Set Up Virtual Environment (Once)
+
 ```bash
-# Install dependencies
-pip install -r tests/requirements.txt
+# Create virtual environment
+python3 -m venv venv
 
+# Activate it
+source venv/bin/activate  # Linux/Mac/WSL
+# OR
+venv\Scripts\activate  # Windows CMD
+# OR
+venv\Scripts\Activate.ps1  # Windows PowerShell
+```
+
+### 2. Install Dependencies (Once)
+
+```bash
+pip install --upgrade pip
+pip install -r tests/requirements.txt
+```
+
+### 3. Run Tests
+
+```bash
 # Run all tests
 pytest tests/ -v
 
-# Run with coverage
-pytest tests/ --cov=custom_components/cable_modem_monitor --cov-report=html
+# Run specific test file
+pytest tests/test_config_flow.py -v
 
-# View coverage report
-open htmlcov/index.html
+# Run specific test
+pytest tests/test_config_flow.py::TestConfigFlow::test_scan_interval_minimum_valid -v
+
+# Run with coverage
+pytest tests/ --cov=custom_components/cable_modem_monitor --cov-report=term
+
+# Generate HTML coverage report
+pytest tests/ --cov=custom_components/cable_modem_monitor --cov-report=html
+# Open htmlcov/index.html in browser
 ```
 
-### Individual Test Suites
+### 4. Run Code Quality Checks
+
 ```bash
-# Unit tests only
-pytest tests/test_modem_scraper.py::TestModemScraper -v
+# Check code quality
+ruff check custom_components/cable_modem_monitor/
 
-# Integration tests only
-pytest tests/test_modem_scraper.py::TestRealWorldScenarios -v
+# Auto-fix issues
+ruff check --fix custom_components/cable_modem_monitor/
+```
 
-# Specific test
-pytest tests/test_modem_scraper.py::TestModemScraper::test_parse_downstream_channels -v
+### 5. Deactivate Virtual Environment (When Done)
+
+```bash
+deactivate
 ```
 
 ## Test Results
 
 ### Current Status
-All 8 tests passing:
-- ✅ `test_parse_downstream_channels`
-- ✅ `test_parse_upstream_channels`
-- ✅ `test_parse_software_version`
-- ✅ `test_parse_system_uptime`
-- ✅ `test_parse_channel_counts`
-- ✅ `test_total_errors_calculation`
-- ✅ `test_motorola_mb_series_full_parse`
-- ✅ `test_power_levels_in_range`
-- ✅ `test_frequencies_in_valid_range`
+**Total Tests:** 53 tests across 3 test files
+- ✅ `test_modem_scraper.py` - Modem parsing logic (8 tests)
+- ✅ `test_config_flow.py` - Configuration validation (25 tests)
+- ✅ `test_coordinator.py` - Data update coordinator (20 tests)
 
 ### Coverage Goals
-- Current: Check CI for latest coverage %
-- Target: >80% code coverage
-- Critical paths: 100% coverage
+- **Current:** ~50%
+- **Target:** 60-70% (realistic for community projects)
+- **Critical paths:** Config flow, coordinator, scraper core functions
 
 ## Adding New Tests
 
@@ -130,16 +229,60 @@ Before each release:
 4. Test with live modem if possible
 5. Review GitHub Actions results
 
+## Troubleshooting
+
+### "ModuleNotFoundError" when running tests
+
+**Solution:** Install test dependencies
+```bash
+source venv/bin/activate
+pip install -r tests/requirements.txt
+```
+
+### Virtual environment not activating
+
+**Linux/Mac/WSL:**
+```bash
+source venv/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
+venv\Scripts\Activate.ps1
+```
+
+**Windows (CMD):**
+```cmd
+venv\Scripts\activate.bat
+```
+
+### Tests pass locally but fail in CI
+
+**Possible causes:**
+1. **Missing dependency** - Check `tests/requirements.txt` includes all imports
+2. **Python version difference** - CI tests on 3.11 and 3.12
+3. **File path issues** - Use relative imports in tests
+4. **Environment-specific code** - Mock external dependencies properly
+
+### Permission denied on test scripts
+
+**Solution:** Make scripts executable
+```bash
+chmod +x run_tests_local.sh quick_test.sh
+```
+
+---
+
 ## Continuous Improvement
 
 ### Planned Enhancements
-- [ ] Add tests for config_flow.py
+- [x] Add tests for config_flow.py
+- [x] Add tests for coordinator.py
 - [ ] Add tests for sensor.py
 - [ ] Add tests for button.py
 - [ ] Integration tests with Home Assistant test framework
 - [ ] Mock HTTP requests for network isolation
 - [ ] Performance benchmarks
-- [ ] Load testing with multiple modems
 
 ### Contributing Tests
 When adding support for new modem models:
