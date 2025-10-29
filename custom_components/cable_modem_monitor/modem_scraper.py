@@ -41,7 +41,7 @@ class ModemScraper:
         all_urls = [
             (f"{self.base_url}/network_setup.jst", 'basic'),       # Technicolor XB7, TC4400
             (f"{self.base_url}/MotoConnection.asp", 'form'),      # Motorola MB series
-            (f"{self.base_url}/cmconnectionstatus.html", 'none'), # Various cable modems
+            (f"{self.base_url}/cmconnectionstatus.html", 'basic'), # Technicolor TC4400
             (f"{self.base_url}/cmSignalData.htm", 'none'),        # Arris SB6141
             (f"{self.base_url}/cmSignal.html", 'none'),           # Various cable modems
             (f"{self.base_url}/", 'none'),                        # Fallback root page
