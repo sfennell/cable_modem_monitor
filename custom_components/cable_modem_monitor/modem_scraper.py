@@ -37,18 +37,23 @@ class ModemScraper:
     def _fetch_data(self) -> tuple[str, str] | None:
         """Fetch data from the modem."""
         urls_to_try = [
-            f"{self.base_url}/network_setup.jst",       # Technicolor XB7, TC4400
-            f"{self.base_url}/MotoConnection.asp",      # Motorola MB series
-            f"{self.base_url}/cmconnectionstatus.html", # Various cable modems
-            f"{self.base_url}/cmSignalData.htm",        # Arris SB6141
-            f"{self.base_url}/cmSignal.html",           # Various cable modems
-            f"{self.base_url}/",                        # Fallback root page
+            (f"{self.base_url}/network_setup.jst", 'basic'),       # Technicolor XB7, TC4400
+            (f"{self.base_url}/MotoConnection.asp", 'form'),      # Motorola MB series
+            (f"{self.base_url}/cmconnectionstatus.html", 'none'), # Various cable modems
+            (f"{self.base_url}/cmSignalData.htm", 'none'),        # Arris SB6141
+            (f"{self.base_url}/cmSignal.html", 'none'),           # Various cable modems
+            (f"{self.base_url}/", 'none'),                        # Fallback root page
         ]
 
-        for url in urls_to_try:
+        for url, auth_type in urls_to_try:
             try:
                 _LOGGER.debug(f"Attempting to fetch {url}")
-                response = self.session.get(url, timeout=10)
+                auth = None
+                if auth_type == 'basic' and self.username and self.password:
+                    auth = (self.username, self.password)
+                
+                response = self.session.get(url, timeout=10, auth=auth)
+
                 if response.status_code == 200:
                     _LOGGER.info(f"Successfully connected to modem at {url} (HTML length: {len(response.text)} bytes)")
                     return response.text, url
