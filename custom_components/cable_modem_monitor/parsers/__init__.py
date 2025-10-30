@@ -53,6 +53,11 @@ def get_parsers() -> List[Type[ModemParser]]:
             except Exception as e:
                 _LOGGER.error(f"Failed to load parser module {full_module_name}: {e}", exc_info=True)
 
+    # Sort parsers by priority (higher priority first)
+    # This ensures model-specific parsers are tried before generic ones
+    parsers.sort(key=lambda p: p.priority, reverse=True)
+
     _LOGGER.debug(f"Finished parser discovery. Found {len(parsers)} parsers.")
+    _LOGGER.debug(f"Parser order by priority: {[f'{p.name} (priority={p.priority})' for p in parsers]}")
 
     return parsers
