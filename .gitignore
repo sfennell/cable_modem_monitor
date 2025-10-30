@@ -15,8 +15,12 @@ build/
 
 # Virtual environment
 venv/
+.venv/
 env/
 ENV/
+
+# Ruff cache
+.ruff_cache/
 
 # Test coverage
 .coverage

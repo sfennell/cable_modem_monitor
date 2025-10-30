@@ -1,6 +1,5 @@
 """Base class for modem parsers."""
 from abc import ABC, abstractmethod
-from typing import Optional
 from bs4 import BeautifulSoup
 
 
@@ -11,6 +10,14 @@ class ModemParser(ABC):
     name: str = "Unknown"
     manufacturer: str = "Unknown"
     models: list[str] = []  # e.g., ["MB7621", "MB8600"]
+
+    # URL patterns this parser can handle
+    # Each pattern is a dict with 'path' and 'auth_method'
+    # auth_method can be: 'none', 'basic', 'form'
+    # The scraper will try URLs in the order specified
+    url_patterns: list[dict[str, str]] = []
+
+    # Legacy field for backward compatibility (deprecated - use url_patterns)
     auth_type: str = 'form'
 
     @classmethod

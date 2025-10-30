@@ -1,16 +1,20 @@
 """Constants for the Cable Modem Monitor integration."""
 
+VERSION = "2.4.1"
+
 DOMAIN = "cable_modem_monitor"
 CONF_HOST = "host"
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_MODEM_CHOICE = "modem_choice"
 
 # Modem detection cache fields
-CONF_DETECTED_MODEM = "detected_modem"
-CONF_DETECTED_MANUFACTURER = "detected_manufacturer"
-CONF_WORKING_URL = "working_url"
-CONF_LAST_DETECTION = "last_detection"
+CONF_PARSER_NAME = "parser_name"  # Cached parser class name for quick lookup
+CONF_DETECTED_MODEM = "detected_modem"  # Display name for UI
+CONF_DETECTED_MANUFACTURER = "detected_manufacturer"  # Display manufacturer for UI
+CONF_WORKING_URL = "working_url"  # Last successful URL
+CONF_LAST_DETECTION = "last_detection"  # Timestamp of last detection
 
 # Polling interval defaults based on industry best practices
 # References:
