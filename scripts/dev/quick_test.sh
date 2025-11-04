@@ -1,6 +1,12 @@
 #!/bin/bash
 # Quick test runner - assumes venv is already set up
-# Use this for rapid testing during development
+#
+# Use this when:
+#   - You've already run run_tests_local.sh at least once
+#   - You want minimal output for rapid iteration
+#   - You're in active development mode
+#
+# For first-time setup or full testing, use run_tests_local.sh instead
 
 set -e
 
