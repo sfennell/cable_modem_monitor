@@ -51,7 +51,9 @@ def _get_migration_patterns() -> dict[str, str]:
     return {
         # Note: Custom/IP prefixes were never released, so we only handle no-prefix entities
         # Downstream channels (full names)
-        r"^sensor\.downstream_ch_(\d+)_(power|snr|frequency|corrected|uncorrected)$": "sensor.cable_modem_downstream_ch_{}_{}",
+        r"^sensor\.downstream_ch_(\d+)_(power|snr|frequency|corrected|uncorrected)$": (
+            "sensor.cable_modem_downstream_ch_{}_{}"
+        ),
         # Downstream channels (short names - ds_ch)
         r"^sensor\.ds_ch_(\d+)_(power|snr|frequency|corrected|uncorrected)$": "sensor.cable_modem_ds_ch_{}_{}",
         # Upstream channels (full names)
